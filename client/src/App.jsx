@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage';
 import ShopSelectionPage from './pages/ShopSelectionPage';
 import DashboardOverview from './pages/DashboardOverview';
 import CustomerPage from './pages/CustomerPage';
+import InventoryPage from './pages/InventoryPage';
+import ReportsPage from './pages/ReportsPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -39,6 +41,22 @@ function App() {
         element={
           <ProtectedRoute>
             <DashboardOverview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/inventory"
+        element={
+          <ProtectedRoute>
+            <InventoryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/reports"
+        element={
+          <ProtectedRoute>
+            <ReportsPage />
           </ProtectedRoute>
         }
       />
