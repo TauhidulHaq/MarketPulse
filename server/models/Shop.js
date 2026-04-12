@@ -12,6 +12,10 @@ const shopSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    logoColor: {
+      type: String,
+      default: "#000000",
+    },
     status: {
       type: String,
       enum: ['connected', 'action_required'],
