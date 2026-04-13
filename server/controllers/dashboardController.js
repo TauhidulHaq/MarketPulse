@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const { success, error } = require('../views/responseHelper');
@@ -7,11 +8,13 @@ const getOverview = async (req, res) => {
     const { shopId } = req.params;
     const { startDate, endDate } = req.query;
 
+    const shopObjectId = new mongoose.Types.ObjectId(shopId);
+
     const dateFilter = {};
     if (startDate) dateFilter.$gte = new Date(startDate);
     if (endDate) dateFilter.$lte = new Date(endDate);
 
-    const orderQuery = { shop: shopId };
+    const orderQuery = { shop: shopObjectId };
     if (Object.keys(dateFilter).length > 0) {
       orderQuery.createdAt = dateFilter;
     }
@@ -32,7 +35,7 @@ const getOverview = async (req, res) => {
     const repeatCustomers = await Customer.countDocuments({ shop: shopId, orderCount: { $gt: 1 } });
     const customerRetention = totalCustomers > 0 ? Math.round((repeatCustomers / totalCustomers) * 100) : 0;
 
-    let prevPeriodQuery = { shop: shopId, status: 'completed' };
+    let prevPeriodQuery = { shop: shopObjectId, status: 'completed' };
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
