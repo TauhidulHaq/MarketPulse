@@ -10,6 +10,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const productRoutes = require('./routes/productRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const alertRoutes = require('./routes/alertRoutes');
 const app = express();
 
 app.use(cors());
