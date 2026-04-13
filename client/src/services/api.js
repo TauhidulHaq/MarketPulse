@@ -7,7 +7,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor - attach JWT token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('mp_token');
@@ -21,7 +20,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,24 +31,18 @@ api.interceptors.response.use(
   }
 );
 
-// ===== API Functions =====
-
-// Auth
 export const loginUser = (data) => api.post('/auth/login', data);
 export const registerUser = (data) => api.post('/auth/register', data);
 export const getMe = () => api.get('/auth/me');
 
-// Shops
 export const getShops = () => api.get('/shops');
 export const getShopById = (id) => api.get(`/shops/${id}`);
 export const createShop = (data) => api.post('/shops', data);
 export const updateShop = (id, data) => api.put(`/shops/${id}`, data);
 
-// Dashboard
 export const getDashboardOverview = (shopId, params) =>
   api.get(`/dashboard/${shopId}/overview`, { params });
 
-// Customers
 export const getCustomers = (shopId, params) =>
   api.get(`/customers/${shopId}`, { params });
 export const getCustomerStats = (shopId) =>
