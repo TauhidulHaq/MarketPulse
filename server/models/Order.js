@@ -33,6 +33,14 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           min: 0,
         },
+        cost: { 
+          type: Number, 
+          default: 0 
+        },
+        saleSource: { 
+          type: String, 
+          default: 'other' 
+        }
       },
     ],
     totalAmount: {

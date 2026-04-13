@@ -8,7 +8,9 @@ const authRoutes = require('./routes/authRoutes');
 const shopRoutes = require('./routes/shopRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const customerRoutes = require('./routes/customerRoutes');
-
+const productRoutes = require('./routes/productRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const alertRoutes = require('./routes/alertRoutes');
 const app = express();
 
 app.use(cors());
@@ -18,6 +20,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Market Pulse API is running' });

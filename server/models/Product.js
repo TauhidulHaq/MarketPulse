@@ -18,6 +18,18 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    performance: {
+      type: Number,
+      default: 0, 
+    },
+    performanceTrend: {
+      type: Number,
+      default: 0,
+    },
+    revenueTrend: {
+      type: Number,
+      default: 0,
+    },
     price: {
       type: Number,
       required: true,
@@ -34,6 +46,12 @@ const productSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+
+    lastRestocked: {
+      type: Date,
+      default: Date.now
+    },
+    
     unitsSold: {
       type: Number,
       default: 0,

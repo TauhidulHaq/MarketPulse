@@ -40,8 +40,10 @@ export const getShopById = (id) => api.get(`/shops/${id}`);
 export const createShop = (data) => api.post('/shops', data);
 export const updateShop = (id, data) => api.put(`/shops/${id}`, data);
 
+
 export const getDashboardOverview = (shopId, params) =>
   api.get(`/dashboard/${shopId}/overview`, { params });
+
 
 export const getCustomers = (shopId, params) =>
   api.get(`/customers/${shopId}`, { params });
