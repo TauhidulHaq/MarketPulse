@@ -11,6 +11,7 @@ const ReportsPage = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -22,7 +23,6 @@ const ReportsPage = () => {
     };
     fetchProducts();
   }, [shopId]);
-
 
   const handleGenerateReport = async (product) => {
     setLoading(true);
@@ -49,7 +49,7 @@ const ReportsPage = () => {
         </header>
 
         {!selectedProduct ? (
-   
+         
           <div className="space-y-4">
             {products.map((product) => (
               <div key={product._id} className="bg-gray-200/50 p-4 rounded-3xl flex items-center justify-between border border-transparent hover:border-emerald-200 transition-all">
@@ -70,7 +70,7 @@ const ReportsPage = () => {
             ))}
           </div>
         ) : (
-       
+        
           <div className="animate-fade-in space-y-8">
             <button 
               onClick={() => { setSelectedProduct(null); setReportData(null); }} 
@@ -79,7 +79,6 @@ const ReportsPage = () => {
               ← Back to Selection
             </button>
 
-            {/*Product Selection and Evaluation */}
             <div className="grid grid-cols-2 gap-8">
               <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-8">
                 <div className="w-28 h-20 bg-gray-200 rounded-2xl"></div>
@@ -108,9 +107,8 @@ const ReportsPage = () => {
               </div>
             </div>
 
-            {/*Dynamic Revenue Performance Metrics */}
+            {/* Metrics*/}
             <div className="grid grid-cols-2 gap-8">
-              {/* Revenue via campaign*/}
               <SummaryCard 
                 title="Revenue via campaign" 
                 value={`$${reportData.revenueBreakdown.campaigns.toLocaleString()}`} 
@@ -122,7 +120,6 @@ const ReportsPage = () => {
                 icon={<span className="text-primary-600">💵</span>}
               />
 
-              {/* Revenue via other sales*/}
               <SummaryCard 
                 title="Revenue via other sales" 
                 value={`$${reportData.revenueBreakdown.other.toLocaleString()}`} 
@@ -136,10 +133,9 @@ const ReportsPage = () => {
             </div>
           </div>
         )}
-      </div>
-    </main>
-  </div>
-);
+      </main>
+    </div>
+  );
 };
 
 export default ReportsPage;
