@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
 import SummaryCard from '../components/SummaryCard';
 
 const InventoryPage = () => {
@@ -80,7 +79,7 @@ const InventoryPage = () => {
             </div>
           </div>
 
-          {/* Product List matching Figma cards */}
+          {/* Product List*/}
           <div className="space-y-8">
             {products.map((product) => (
               <div key={product._id} className="animate-slide-up">
