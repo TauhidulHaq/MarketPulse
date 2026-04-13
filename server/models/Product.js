@@ -46,6 +46,12 @@ const productSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+
+    lastRestocked: {
+      type: Date,
+      default: Date.now
+    },
+    
     unitsSold: {
       type: Number,
       default: 0,
