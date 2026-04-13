@@ -22,6 +22,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/alerts', alertRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Market Pulse API is running' });
