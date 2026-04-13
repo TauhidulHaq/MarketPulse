@@ -18,6 +18,18 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    performance: {
+      type: Number,
+      default: 
+    },
+    performanceTrend: {
+      type: Number,
+      default: 0
+    },
+    revenueTrend: {
+      type: Number,
+      default: 0
+    },
     price: {
       type: Number,
       required: true,
