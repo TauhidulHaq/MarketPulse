@@ -20,15 +20,15 @@ const productSchema = new mongoose.Schema(
     },
     performance: {
       type: Number,
-      default: 
+      default: 0, 
     },
     performanceTrend: {
       type: Number,
-      default: 0
+      default: 0,
     },
     revenueTrend: {
       type: Number,
-      default: 0
+      default: 0,
     },
     price: {
       type: Number,
