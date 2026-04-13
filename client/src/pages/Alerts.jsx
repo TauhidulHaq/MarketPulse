@@ -37,13 +37,13 @@ const Alerts = () => {
   return (
     <div className="flex bg-gray-50 min-h-screen">
       
-      {/* 1. Inject the Sidebar and pass the dynamic shop details */}
+      
       <Sidebar 
         shopName={dashboardData.shop?.name} 
         shopColor={dashboardData.shop?.color} 
       />
 
-      {/* 2. Wrap content in flex-1 and add ml-56 to clear the fixed sidebar */}
+    
       <div className="flex-1 ml-56 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -55,7 +55,7 @@ const Alerts = () => {
           </button>
         </div>
 
-        {/* Top Metrics Cards */}
+      
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h3 className="text-red-600 font-bold text-sm tracking-wider mb-2">CRITICAL STOCK</h3>
@@ -80,7 +80,7 @@ const Alerts = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Items Requiring Action */}
+       
           <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-xl font-bold mb-4">ITEMS REQUIRING ACTION</h2>
             {dashboardData.itemsRequiringAction.length === 0 ? (
@@ -106,7 +106,7 @@ const Alerts = () => {
             )}
           </div>
 
-          {/* Live Sales Feed */}
+       
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-xl font-bold mb-4">LIVE SALES</h2>
             <div className="space-y-3">
