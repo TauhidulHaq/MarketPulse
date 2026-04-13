@@ -6,6 +6,7 @@ import DashboardOverview from './pages/DashboardOverview';
 import CustomerPage from './pages/CustomerPage';
 import InventoryPage from './pages/InventoryPage';
 import ReportsPage from './pages/ReportsPage';
+import Alerts from './pages/Alerts';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -44,6 +45,16 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/shop/:shopId/alerts"
+        element={
+          <ProtectedRoute>
+            <Alerts />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route
         path="/shop/:shopId/inventory"
         element={
