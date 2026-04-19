@@ -54,7 +54,9 @@ const CustomerTable = ({ customers }) => {
         <thead>
           <tr className="border-b border-gray-100">
             <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Customer</th>
+            <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Phone</th>
             <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Rank</th>
+            <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Total Spent</th>
             <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Avg. Spend</th>
             <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Frequency</th>
           </tr>
@@ -79,7 +81,19 @@ const CustomerTable = ({ customers }) => {
               </td>
 
               <td className="py-4 px-6">
+                <span className="text-sm font-medium text-gray-500">
+                  {customer.phone || 'N/A'}
+                </span>
+              </td>
+
+              <td className="py-4 px-6">
                 <span className={getRankBadgeClass(customer.rank)}>{customer.rank}</span>
+              </td>
+
+              <td className="py-4 px-6">
+                <span className="text-sm text-gray-700 font-bold">
+                  $ {customer.totalSpend?.toFixed(2) || '0.00'}
+                </span>
               </td>
 
               <td className="py-4 px-6">

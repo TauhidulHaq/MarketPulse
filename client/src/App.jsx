@@ -7,6 +7,9 @@ import CustomerPage from './pages/CustomerPage';
 import InventoryPage from './pages/InventoryPage';
 import ReportsPage from './pages/ReportsPage';
 import Alerts from './pages/Alerts';
+import SimulatorPage from './pages/SimulatorPage';
+import PromotionsPage from './pages/PromotionsPage';
+import RefundsPage from './pages/RefundsPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -76,6 +79,31 @@ function App() {
         element={
           <ProtectedRoute>
             <CustomerPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/shop/:shopId/simulator"
+        element={
+          <ProtectedRoute>
+            <SimulatorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/campaigns"
+        element={
+          <ProtectedRoute>
+            <PromotionsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/refunds"
+        element={
+          <ProtectedRoute>
+            <RefundsPage />
           </ProtectedRoute>
         }
       />

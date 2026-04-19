@@ -18,6 +18,11 @@ const customerSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    phone: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     avatar: {
       type: String,
       default: '#6B7280',

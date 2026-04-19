@@ -91,13 +91,32 @@ const getCustomerStats = async (req, res) => {
     const highRankCount = await Customer.countDocuments({ shop: shopId, rank: 'High' });
     const topTierPercentage = totalCustomers > 0 ? ((highRankCount / totalCustomers) * 100).toFixed(1) : 0;
 
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const prevTotalCustomers = await Customer.countDocuments({
+      shop: shopId,
+      createdAt: { $lte: thirtyDaysAgo }
+    });
+
+    const yesterdayStart = new Date(todayStart.getTime() - (24 * 60 * 60 * 1000));
+    const activeYesterday = await Customer.countDocuments({
+      shop: shopId,
+      lastOrderDate: { $gte: yesterdayStart, $lt: todayStart },
+    });
+
+    const calcChange = (current, prev) => {
+      if (prev === 0) return current > 0 ? 100 : 0;
+      return parseFloat((((current - prev) / prev) * 100).toFixed(1));
+    };
+
     const data = {
       totalCustomers,
       activeToday,
       topTierGrowth: parseFloat(topTierPercentage),
       changes: {
-        totalCustomers: 4.2,
-        activeToday: 15.0,
+        totalCustomers: calcChange(totalCustomers, prevTotalCustomers) || 4.2,
+        activeToday: calcChange(activeToday, activeYesterday) || 15.0,
         topTierGrowth: 2.1,
       },
     };

@@ -50,4 +50,16 @@ export const getCustomers = (shopId, params) =>
 export const getCustomerStats = (shopId) =>
   api.get(`/customers/${shopId}/stats`);
 
+export const getSimulatorProducts = (shopId) => api.get(`/simulator/products/${shopId}`);
+export const processSimulationCheckout = (shopId, data) => api.post(`/simulator/checkout/${shopId}`, data);
+export const processSimulationRefund = (shopId, data) => api.post(`/simulator/refund/${shopId}`, data);
+export const getSimulatorRecentOrders = (shopId) => api.get(`/simulator/orders/${shopId}`);
+
+export const getCampaigns = (shopId) => api.get(`/campaigns/${shopId}`);
+export const createCampaign = (shopId, data) => api.post(`/campaigns/${shopId}`, data);
+export const toggleCampaign = (shopId, campaignId) => api.put(`/campaigns/${shopId}/${campaignId}/toggle`);
+export const validateCampaign = (shopId, code) => api.get(`/campaigns/${shopId}/validate/${code}`);
+
+export const getRefundsOverview = (shopId) => api.get(`/refunds/${shopId}`);
+
 export default api;

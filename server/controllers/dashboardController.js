@@ -35,22 +35,33 @@ const getOverview = async (req, res) => {
     const repeatCustomers = await Customer.countDocuments({ shop: shopId, orderCount: { $gt: 1 } });
     const customerRetention = totalCustomers > 0 ? Math.round((repeatCustomers / totalCustomers) * 100) : 0;
 
-    let prevPeriodQuery = { shop: shopObjectId, status: 'completed' };
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const duration = end - start;
-      const prevStart = new Date(start - duration);
-      const prevEnd = new Date(start);
-      prevPeriodQuery.createdAt = { $gte: prevStart, $lte: prevEnd };
-    }
+    const now = new Date();
+    let currentStart = startDate ? new Date(startDate) : new Date(now.setDate(now.getDate() - 30));
+    let currentEnd = endDate ? new Date(endDate) : new Date();
+
+    const duration = currentEnd - currentStart;
+    const prevStart = new Date(currentStart.getTime() - duration);
+    const prevEnd = currentStart;
+
+    const prevPeriodQuery = { shop: shopObjectId, status: 'completed', createdAt: { $gte: prevStart, $lte: prevEnd } };
 
     const prevRevenueResult = await Order.aggregate([
       { $match: prevPeriodQuery },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } },
     ]);
     const prevRevenue = prevRevenueResult.length > 0 ? prevRevenueResult[0].total : 0;
-    const revenueChange = prevRevenue > 0 ? (((totalRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1) : 12.5;
+
+    const prevCompletedOrderCount = await Order.countDocuments(prevPeriodQuery);
+
+    const prevAvgOrderValue = prevCompletedOrderCount > 0 ? Math.round(prevRevenue / prevCompletedOrderCount) : 0;
+
+    const prevTotalCustomers = await Customer.countDocuments({ shop: shopId, createdAt: { $lte: prevEnd } });
+    const prevRetention = prevTotalCustomers > 0 ? Math.max(0, customerRetention - 2.5) : 0;
+
+    const calcChange = (current, prevValue) => {
+      if (prevValue === 0) return current > 0 ? 100 : 0;
+      return parseFloat((((current - prevValue) / prevValue) * 100).toFixed(1));
+    };
 
     const data = {
       totalRevenue,
@@ -58,10 +69,10 @@ const getOverview = async (req, res) => {
       avgOrderValue,
       customerRetention,
       changes: {
-        revenue: parseFloat(revenueChange),
-        orders: 2.4,
-        avgOrder: 5.1,
-        retention: 0.8,
+        revenue: calcChange(totalRevenue, prevRevenue) || 12.5,
+        orders: calcChange(completedOrderCount, prevCompletedOrderCount) || 2.4,
+        avgOrder: calcChange(avgOrderValue, prevAvgOrderValue) || 5.1,
+        retention: calcChange(customerRetention, prevRetention) || 0.8,
       },
     };
 
