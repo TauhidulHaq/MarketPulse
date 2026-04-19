@@ -22,6 +22,14 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: 'https://via.placeholder.com/150' 
     },
+    campaignRevenue: {
+      type: Number,
+      default: 0,
+    },
+    otherRevenue: {
+      type: Number,
+      default: 0,
+    },
     price: { 
       type: Number, required: true, min: 0 },
     performance: {
