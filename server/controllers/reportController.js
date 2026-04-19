@@ -1,4 +1,3 @@
-const Order = require('../models/Order');
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
 const { success, error } = require('../views/responseHelper');
@@ -11,30 +10,19 @@ exports.generateSingleProductReport = async (req, res) => {
       return error(res, 400, "A valid productId is required.");
     }
 
-    const productObjectId = new mongoose.Types.ObjectId(productId);
+    const product = await Product.findById(productId);
+    
+    if (!product) {
+      return error(res, 404, "Product not found.");
+    }
 
-    const stats = await Order.aggregate([
-      { $match: { "products.product": productObjectId, status: "completed" } },
-      { $unwind: "$products" },
-      { $match: { "products.product": productObjectId } },
-      {
-        $group: {
-          _id: "$products.saleSource",
-          revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } }
-        }
-      }
-    ]);
-
-    const productDetails = await Product.findById(productId);
-    const campaignsData = stats.find(s => s._id === 'campaign') || { revenue: 0 };
-    const otherSalesData = stats.find(s => s._id === 'simulator') || { revenue: 0 };
 
     return success(res, {
-      productName: productDetails?.name || "Unknown Product",
-      evaluation: productDetails.revenue > 2000 ? 'GOOD' : 'Moderate',
+      productName: product.name,
+      evaluation: product.revenue > 2000 ? 'GOOD' : 'Moderate',
       revenueBreakdown: {
-        campaigns: parseFloat(campaignsData.revenue.toFixed(2)),
-        other: parseFloat(otherSalesData.revenue.toFixed(2))
+        campaigns: parseFloat((product.campaignRevenue || 0).toFixed(2)),
+        other: parseFloat((product.otherRevenue || 0).toFixed(2))
       }
     }, "Report generated successfully.");
 
