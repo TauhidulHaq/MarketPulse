@@ -20,36 +20,18 @@ exports.generateSingleProductReport = async (req, res) => {
       {
         $group: {
           _id: "$products.saleSource",
-         
-          revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } },
-          profit: { 
-            $sum: { 
-              $multiply: [
-                { $subtract: ["$products.price", "$products.cost"] }, 
-                "$products.quantity" 
-              ] 
-            } 
-          }
+          revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } }
         }
       }
     ]);
 
     const productDetails = await Product.findById(productId);
-    const totalProfit = stats.reduce((acc, s) => acc + s.profit, 0);
-
-    let evaluation = 'Bad';
-    if (totalProfit > 5000) evaluation = 'GOOD';
-    else if (totalProfit > 2000) evaluation = 'Moderate';
-
     const campaignsData = stats.find(s => s._id === 'campaign') || { revenue: 0 };
-    const otherSalesData = stats
-      .filter(s => s._id !== 'campaign')
-      .reduce((acc, curr) => ({ revenue: acc.revenue + curr.revenue }), { revenue: 0 });
+    const otherSalesData = stats.find(s => s._id === 'simulator') || { revenue: 0 };
 
     return success(res, {
       productName: productDetails?.name || "Unknown Product",
-      evaluation,
-      totalProfit: parseFloat(totalProfit.toFixed(2)),
+      evaluation: productDetails.revenue > 2000 ? 'GOOD' : 'Moderate',
       revenueBreakdown: {
         campaigns: parseFloat(campaignsData.revenue.toFixed(2)),
         other: parseFloat(otherSalesData.revenue.toFixed(2))
