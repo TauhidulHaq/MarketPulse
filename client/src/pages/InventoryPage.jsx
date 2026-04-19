@@ -27,10 +27,13 @@ const InventoryPage = () => {
 
   useEffect(() => {
     fetchProducts();
+    
+  
     const handleVisibilityChange = () => { 
       if (document.visibilityState === 'visible') fetchProducts(); 
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [shopId]);
 
@@ -44,25 +47,22 @@ const InventoryPage = () => {
           <p className="text-gray-400 text-sm">View in-depth real-time insights about your product</p>
         </header>
 
-        {/* Dynamic Filter Bar */}
+     
         <div className="card px-5 py-4 mb-8 flex items-center gap-4 animate-fade-in">
           <span className="text-gray-700 font-semibold text-sm">Filter By:</span>
           
-          {/* Revenue Filter */}
           <select className="filter-select" onChange={(e) => setFilters({...filters, revenue: e.target.value})}>
             <option value="">Revenue</option>
             <option value="highest">Highest</option>
             <option value="lowest">Lowest</option>
           </select>
           
-    
           <select className="filter-select" onChange={(e) => setFilters({...filters, stock: e.target.value})}>
             <option value="">Stock Level</option>
             <option value="high">High</option>
             <option value="moderate">Moderate</option>
             <option value="low">Low</option>
           </select>
-
           
           <select className="filter-select" onChange={(e) => setFilters({...filters, performance: e.target.value})}>
             <option value="">Performance</option>
@@ -76,18 +76,15 @@ const InventoryPage = () => {
           </div>
         </div>
 
-     
+
         <div className="space-y-8">
           {products.map((product) => (
             <div key={product._id} className="animate-slide-up">
               <h3 className="font-bold text-gray-800 mb-3 ml-2">{product.name}</h3>
               <div className="bg-gray-200/50 p-6 rounded-[2.5rem] grid grid-cols-4 gap-6 items-center">
                 <div className="bg-white rounded-3xl overflow-hidden aspect-video shadow-sm border border-gray-100 flex items-center justify-center">
-                   <img 
-                      src={product.image || 'https://via.placeholder.com/150'} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover" 
-                   />
+                  
+                   <img src={product.image || 'https://via.placeholder.com/150'} alt={product.name} className="w-full h-full object-cover" />
                 </div>
                 
                 <SummaryCard 
