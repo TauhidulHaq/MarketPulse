@@ -18,6 +18,12 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    image: {
+      type: String,
+      default: 'https://via.placeholder.com/150' 
+    },
+    price: { 
+      type: Number, required: true, min: 0 },
     performance: {
       type: Number,
       default: 0, 
