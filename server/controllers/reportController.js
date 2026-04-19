@@ -14,31 +14,21 @@ exports.generateSingleProductReport = async (req, res) => {
     const productObjectId = new mongoose.Types.ObjectId(productId);
 
     const stats = await Order.aggregate([
-      {
-        $match: {
-          "products.product": productObjectId,
-          status: "completed"
-        }
-      },
+      { $match: { "products.product": productObjectId, status: "completed" } },
       { $unwind: "$products" },
-      {
-        $match: {
-          "products.product": productObjectId
-        }
-      },
+      { $match: { "products.product": productObjectId } },
       {
         $group: {
           _id: "$products.saleSource",
-          revenue: {
-            $sum: { $multiply: ["$products.price", "$products.quantity"] }
-          },
-          profit: {
-            $sum: {
+         
+          revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } },
+          profit: { 
+            $sum: { 
               $multiply: [
-                { $subtract: ["$products.price", "$products.cost"] },
-                "$products.quantity"
-              ]
-            }
+                { $subtract: ["$products.price", "$products.cost"] }, 
+                "$products.quantity" 
+              ] 
+            } 
           }
         }
       }
@@ -52,8 +42,6 @@ exports.generateSingleProductReport = async (req, res) => {
     else if (totalProfit > 2000) evaluation = 'Moderate';
 
     const campaignsData = stats.find(s => s._id === 'campaign') || { revenue: 0 };
-    
-   
     const otherSalesData = stats
       .filter(s => s._id !== 'campaign')
       .reduce((acc, curr) => ({ revenue: acc.revenue + curr.revenue }), { revenue: 0 });
