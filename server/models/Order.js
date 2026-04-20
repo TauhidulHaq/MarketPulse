@@ -14,8 +14,8 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     customerLocation: {
-      division: String,
-      district: String
+    division: { type: String, default: 'Unknown' },
+    district: { type: String, default: 'Unknown' }
     },
     orderNumber: {
       type: String,
