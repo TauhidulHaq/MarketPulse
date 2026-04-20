@@ -3,14 +3,72 @@ const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Refund = require('../models/Refund');
 const mongoose = require('mongoose');
+const Campaign = require('../models/Campaign'); //added this 
 const { success, error } = require('../views/responseHelper');
 
+
+//added
 const getSimulatorProducts = async (req, res) => {
   try {
     const { shopId } = req.params;
-    const products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+    let products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+
+    const currentDate = new Date();
+    let rulesApplied = false;
+
+    
+    for (let product of products) {
+      if (product.expirationDate) {
+        const daysToExpiry = Math.ceil((product.expirationDate - currentDate) / (1000 * 60 * 60 * 24));
+        let targetDiscount = 0;
+
+        if (daysToExpiry > 0 && daysToExpiry <= 7) {
+          targetDiscount = 50; 
+        } else if (daysToExpiry > 7 && daysToExpiry <= 14) {
+          targetDiscount = 40; 
+        } else if (daysToExpiry > 14 && daysToExpiry <= 30) {
+          targetDiscount = 30; 
+        }
+
+        //
+        if (targetDiscount > 0 && product.autoPromoDiscount !== targetDiscount) {
+          
+         
+          const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
+          const newCode = `${prefix}${targetDiscount}`; // e.g., ESPR50 or LATT30
+
+     
+          let campaign = await Campaign.findOne({ shop: shopId, code: newCode });
+          
+          if (!campaign) {
+            await Campaign.create({
+              shop: shopId,
+              name: `Auto Liquidation: ${product.name}`,
+              code: newCode,
+              discountPercentage: targetDiscount,
+              isActive: true,
+              usageCount: 0,
+              revenueGenerated: 0
+            });
+          }
+
+ 
+          product.autoPromoCode = newCode;
+          product.autoPromoDiscount = targetDiscount;
+          await product.save();
+          rulesApplied = true;
+        }
+      }
+    }
+
+    
+    if (rulesApplied) {
+      products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+    }
+
     return success(res, products, 'Products retrieved for simulator.');
   } catch (err) {
+    console.error(err);
     return error(res, 500, 'Failed to fetch simulator products.');
   }
 };
