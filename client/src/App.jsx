@@ -11,6 +11,7 @@ import SimulatorPage from './pages/SimulatorPage';
 import PromotionsPage from './pages/PromotionsPage';
 import RefundsPage from './pages/RefundsPage';
 import SalesChartPage from './pages/SalesChartPage';
+import UpdatePricePage from './pages/UpdatePricePage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
