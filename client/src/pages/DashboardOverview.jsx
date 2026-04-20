@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import SummaryCard from '../components/SummaryCard';
+import GoalTracker from '../components/GoalTracker';
+import BestHoursHeatmap from '../components/BestHoursHeatmap';
 import { getShopById, getDashboardOverview } from '../services/api';
 
 const DashboardOverview = () => {
@@ -167,6 +169,10 @@ const DashboardOverview = () => {
             subtitle="vs last month"
             delay={300}
           />
+          <GoalTracker />
+        </div>
+        <div className="mt-6">
+          <BestHoursHeatmap shopId={shopId} />
         </div>
       </main>
     </div>

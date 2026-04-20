@@ -40,12 +40,15 @@ const login = async (req, res) => {
       return error(res, 400, 'Username and password are required.');
     }
 
+    console.log('Login attempt for username:', username);
     const user = await User.findOne({ username }).populate('shops');
+    console.log('Found user:', !!user, user ? user.username : null);
     if (!user) {
       return error(res, 401, 'Invalid credentials.');
     }
 
     const isMatch = await user.comparePassword(password);
+    console.log('Password match:', isMatch);
     if (!isMatch) {
       return error(res, 401, 'Invalid credentials.');
     }

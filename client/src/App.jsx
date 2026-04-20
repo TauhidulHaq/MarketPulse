@@ -7,6 +7,7 @@ import CustomerPage from './pages/CustomerPage';
 import InventoryPage from './pages/InventoryPage';
 import ReportsPage from './pages/ReportsPage';
 import Alerts from './pages/Alerts';
+import OrdersPage from './pages/OrdersPage';
 import SimulatorPage from './pages/SimulatorPage';
 import PromotionsPage from './pages/PromotionsPage';
 import RefundsPage from './pages/RefundsPage';
@@ -104,6 +105,14 @@ function App() {
         element={
           <ProtectedRoute>
             <RefundsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/orders"
+        element={
+          <ProtectedRoute>
+            <OrdersPage />
           </ProtectedRoute>
         }
       />

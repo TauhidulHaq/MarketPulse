@@ -44,6 +44,17 @@ export const updateShop = (id, data) => api.put(`/shops/${id}`, data);
 export const getDashboardOverview = (shopId, params) =>
   api.get(`/dashboard/${shopId}/overview`, { params });
 
+export const getShopGoal = (shopId) => api.get(`/shops/${shopId}/goal`);
+export const setShopGoal = (shopId, data) => api.post(`/shops/${shopId}/goal`, data);
+
+export const getTopHours = (shopId, params) => api.get(`/dashboard/${shopId}/top-hours`, { params });
+
+export const getProductReviews = (productId) => api.get(`/products/${productId}/reviews`);
+export const postProductReview = (productId, data) => api.post(`/products/${productId}/reviews`, data);
+
+export const updateOrderStatus = (orderId, data) => api.put(`/orders/${orderId}/status`, data);
+export const getOrders = (params) => api.get('/orders', { params });
+
 
 export const getCustomers = (shopId, params) =>
   api.get(`/customers/${shopId}`, { params });

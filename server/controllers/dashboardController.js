@@ -83,4 +83,29 @@ const getOverview = async (req, res) => {
   }
 };
 
-module.exports = { getOverview };
+  const getTopHours = async (req, res) => {
+    try {
+      const { shopId } = req.params;
+      const { start, end } = req.query;
+      const startDate = start ? new Date(start) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const endDate = end ? new Date(end) : new Date();
+
+      const agg = await Order.aggregate([
+        { $match: { shop: new mongoose.Types.ObjectId(shopId), createdAt: { $gte: startDate, $lte: endDate }, status: 'completed' } },
+        { $project: { amount: '$totalAmount', hour: { $hour: '$createdAt' }, dayOfWeek: { $dayOfWeek: '$createdAt' } } },
+        { $group: { _id: { day: '$dayOfWeek', hour: '$hour' }, revenue: { $sum: '$amount' } } },
+        { $project: { _id: 0, day: '$_id.day', hour: '$_id.hour', revenue: 1 } },
+        { $sort: { day: 1, hour: 1 } },
+      ]);
+
+      // convert day from 1-7 (Mongo) to 0-6 (Sun=0)
+      const result = agg.map(a => ({ day: (a.day + 6) % 7, hour: a.hour, revenue: a.revenue }));
+
+      return success(res, result, 'Top hours');
+    } catch (err) {
+      console.error('getTopHours error:', err);
+      return error(res, 500, 'Failed to compute top hours');
+    }
+  };
+
+module.exports = { getOverview, getTopHours };

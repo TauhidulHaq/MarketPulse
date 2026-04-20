@@ -33,6 +33,10 @@ const shopSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    dailyGoal: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
