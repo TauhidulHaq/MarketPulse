@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { getSimulatorProducts, processSimulationCheckout, processSimulationRefund, getSimulatorRecentOrders, validateCampaign } from '../services/api';
+
+import { 
+  getSimulatorProducts, 
+  processSimulationCheckout, 
+  processSimulationRefund, 
+  getSimulatorRecentOrders, 
+  validateCampaign,
+  trackCartRemovalAPI
+} from '../services/api';
 
 const SimulatorPage = () => {
   const { shopId } = useParams();
@@ -55,7 +63,26 @@ const SimulatorPage = () => {
     }
   };
 
-  const changeQty = (productId, delta) => {
+
+const changeQty = async (productId, delta) => {
+    //calc
+    if (delta < 0) {
+      const itemToReduce = cart.find(item => item.productId === productId);
+      if (itemToReduce) {
+        try {
+        
+          await trackCartRemovalAPI(shopId, {
+            productId: itemToReduce.productId,
+            quantity: Math.abs(delta),
+            price: itemToReduce.price
+          });
+        } catch (err) {
+          console.error("Failed to track cart abandonment", err);
+        }
+      }
+    }
+
+    
     setCart(cart.map(item => {
       if (item.productId === productId) {
         return { ...item, quantity: item.quantity + delta };
