@@ -2,19 +2,17 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
-import {
-  getSimulatorProducts,
-  processSimulationCheckout,
-  processSimulationRefund,
-  getSimulatorRecentOrders,
+import { 
+  getSimulatorProducts, 
+  processSimulationCheckout, 
+  processSimulationRefund, 
+  getSimulatorRecentOrders, 
   validateCampaign,
-  trackCartRemovalAPI,
-  getShopById
+  trackCartRemovalAPI
 } from '../services/api';
 
 const SimulatorPage = () => {
   const { shopId } = useParams();
-  const [shop, setShop] = useState(null);
   const [activeTab, setActiveTab] = useState('buy');
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -35,16 +33,12 @@ const SimulatorPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [shopRes, dataRes] = await Promise.all([
-        getShopById(shopId),
-        activeTab === 'buy' ? getSimulatorProducts(shopId) : getSimulatorRecentOrders(shopId)
-      ]);
-
-      setShop(shopRes.data.data);
       if (activeTab === 'buy') {
-        setProducts(dataRes.data.data);
+        const res = await getSimulatorProducts(shopId);
+        setProducts(res.data.data);
       } else {
-        setRecentOrders(dataRes.data.data);
+        const res = await getSimulatorRecentOrders(shopId);
+        setRecentOrders(res.data.data);
       }
     } catch (err) {
       console.error(err);
@@ -69,14 +63,12 @@ const SimulatorPage = () => {
     }
   };
 
-
   const changeQty = async (productId, delta) => {
-    //calc
+ ///
     if (delta < 0) {
       const itemToReduce = cart.find(item => item.productId === productId);
       if (itemToReduce) {
         try {
-
           await trackCartRemovalAPI(shopId, {
             productId: itemToReduce.productId,
             quantity: Math.abs(delta),
@@ -88,7 +80,7 @@ const SimulatorPage = () => {
       }
     }
 
-
+    
     setCart(cart.map(item => {
       if (item.productId === productId) {
         return { ...item, quantity: item.quantity + delta };
@@ -151,7 +143,7 @@ const SimulatorPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar shopName={shop?.name} shopColor={shop?.color} />
+      <Sidebar />
       <main className="flex-1 ml-56 p-8">
 
         <header className="mb-8 flex items-center justify-between">
@@ -160,13 +152,13 @@ const SimulatorPage = () => {
             <p className="text-gray-500">Process manual orders and returns locally.</p>
           </div>
           <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
-            <button
+            <button 
               onClick={() => setActiveTab('buy')}
               className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeTab === 'buy' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
             >
               New Sale
             </button>
-            <button
+            <button 
               onClick={() => setActiveTab('refund')}
               className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeTab === 'refund' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
             >
@@ -197,6 +189,16 @@ const SimulatorPage = () => {
                       Add
                     </button>
                   </div>
+                  
+            
+                  {p.autoPromoCode && (
+                    <div className="mt-4 p-2 bg-red-50 border border-red-100 rounded-lg text-center">
+                      <p className="text-xs text-red-700 font-medium">
+                        Use code <span className="font-bold bg-white px-1.5 py-0.5 rounded border border-red-200 tracking-wide">{p.autoPromoCode}</span> for <span className="font-bold">{p.autoPromoDiscount}% discount</span>
+                      </p>
+                    </div>
+                  )}
+
                 </div>
               ))}
               {products.length === 0 && <p className="text-gray-500 text-sm">No products available. Add some products first.</p>}
@@ -230,7 +232,7 @@ const SimulatorPage = () => {
                 <span className="text-gray-500 font-medium">Subtotal:</span>
                 <span className="text-lg font-bold text-gray-900">${(cartTotal + discountAmount).toFixed(2)}</span>
               </div>
-
+              
               {appliedPromo && (
                 <div className="flex justify-between items-center mb-4 text-emerald-600">
                   <span className="font-medium text-sm">Discount (-{appliedPromo.discountPercentage}%):</span>
@@ -244,10 +246,10 @@ const SimulatorPage = () => {
               </div>
 
               <form onSubmit={applyPromo} className="flex gap-2 mb-6">
-                <input type="text" placeholder="Promo Code"
-                  value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                  className="flex-1 text-sm px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary-500" />
-                <button type="submit" disabled={!promoCode} className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-bold disabled:opacity-50">Apply</button>
+                 <input type="text" placeholder="Promo Code" 
+                   value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                   className="flex-1 text-sm px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary-500" />
+                 <button type="submit" disabled={!promoCode} className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-bold disabled:opacity-50">Apply</button>
               </form>
 
               <form onSubmit={handleCheckout} className="space-y-4">
@@ -333,7 +335,6 @@ const SimulatorPage = () => {
         )}
 
       </main>
-
 
       {toast && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 z-50 animate-bounce">
