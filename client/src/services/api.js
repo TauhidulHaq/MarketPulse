@@ -40,15 +40,10 @@ export const getShopById = (id) => api.get(`/shops/${id}`);
 export const createShop = (data) => api.post('/shops', data);
 export const updateShop = (id, data) => api.put(`/shops/${id}`, data);
 
+export const getDashboardOverview = (shopId, params) => api.get(`/dashboard/${shopId}/overview`, { params });
 
-export const getDashboardOverview = (shopId, params) =>
-  api.get(`/dashboard/${shopId}/overview`, { params });
-
-
-export const getCustomers = (shopId, params) =>
-  api.get(`/customers/${shopId}`, { params });
-export const getCustomerStats = (shopId) =>
-  api.get(`/customers/${shopId}/stats`);
+export const getCustomers = (shopId, params) => api.get(`/customers/${shopId}`, { params });
+export const getCustomerStats = (shopId) => api.get(`/customers/${shopId}/stats`);
 
 export const getSimulatorProducts = (shopId) => api.get(`/simulator/products/${shopId}`);
 export const processSimulationCheckout = (shopId, data) => api.post(`/simulator/checkout/${shopId}`, data);
@@ -61,5 +56,7 @@ export const toggleCampaign = (shopId, campaignId) => api.put(`/campaigns/${shop
 export const validateCampaign = (shopId, code) => api.get(`/campaigns/${shopId}/validate/${code}`);
 
 export const getRefundsOverview = (shopId) => api.get(`/refunds/${shopId}`);
+
+export const trackCartRemovalAPI = (shopId, data) => api.post(`/simulator/track-removal/${shopId}`, data);
 
 export default api;

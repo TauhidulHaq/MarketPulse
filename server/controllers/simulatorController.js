@@ -167,11 +167,31 @@ const getRecentOrders = async (req, res) => {
   } catch (err) {
     return error(res, 500, 'Failed to fetch recent orders.');
   }
-}
+};
+
+const trackCartRemoval = async (req, res) => {
+  try {
+    const { productId, quantity, price } = req.body;
+    
+    const product = await Product.findById(productId);
+    if (product) {
+      product.lostSalesQuantity = (product.lostSalesQuantity || 0) + quantity;
+      product.lostRevenue = (product.lostRevenue || 0) + (quantity * price);
+      await product.save();
+    }
+
+    return success(res, null, 'Cart removal tracked.');
+  } catch (err) {
+    console.error('Track removal error:', err);
+    return error(res, 500, 'Failed to track removal.');
+  }
+};
+
 
 module.exports = {
   getSimulatorProducts,
   processCheckout,
   processRefund,
   getRecentOrders
+  trackCartRemoval
 };

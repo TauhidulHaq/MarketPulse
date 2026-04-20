@@ -9,6 +9,7 @@ const Sidebar = ({ shopName, shopColor }) => {
     { label: 'Overview', path: `/shop/${shopId}/overview`, icon: 'grid' },
     { label: 'Alerts', path: `/shop/${shopId}/alerts`, icon: 'alert' },
     { label: 'Inventory', path: `/shop/${shopId}/inventory`, icon: 'inventory' },
+    { label: 'Update Product Price', path: `/shop/${shopId}/update-price`, icon: 'inventory' },
     { label: 'Sales Chart', path: `/shop/${shopId}/sales-chart`, icon: 'cart' },
     { label: 'Reports', path: `/shop/${shopId}/reports`, icon: 'report' },
     { label: 'Customer', path: `/shop/${shopId}/customers`, icon: 'customer' },

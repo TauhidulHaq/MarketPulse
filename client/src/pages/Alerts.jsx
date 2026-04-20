@@ -9,6 +9,7 @@ const Alerts = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
+  const [showLostSalesModal, setShowLostSalesModal] = useState(false);
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -37,13 +38,11 @@ const Alerts = () => {
   return (
     <div className="flex bg-gray-50 min-h-screen">
       
-      
       <Sidebar 
         shopName={dashboardData.shop?.name} 
         shopColor={dashboardData.shop?.color} 
       />
 
-    
       <div className="flex-1 ml-56 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -55,8 +54,8 @@ const Alerts = () => {
           </button>
         </div>
 
-      
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+       
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h3 className="text-red-600 font-bold text-sm tracking-wider mb-2">CRITICAL STOCK</h3>
             <p className="text-4xl font-bold">{dashboardData.metrics.criticalStockCount}</p>
@@ -77,10 +76,22 @@ const Alerts = () => {
             <p className="text-4xl font-bold">{notifCount}</p>
             <p className="text-gray-400 text-sm mt-2">Customers have been notified based on their purchase patterns. Click to manage.</p>
           </div>
+
+         
+          <div 
+            className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer hover:border-blue-300 transition-colors"
+            onClick={() => setShowLostSalesModal(true)}
+          >
+            <h3 className="text-gray-500 font-bold text-sm tracking-wider mb-2">CART ABANDONMENT</h3>
+            <p className="text-4xl font-bold text-gray-800">
+              ${dashboardData.metrics.totalLostRevenue?.toFixed(2) || '0.00'}
+            </p>
+            <p className="text-gray-400 text-sm mt-2">Value of items removed from active carts. Click to analyze.</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-       
+     
           <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-xl font-bold mb-4">ITEMS REQUIRING ACTION</h2>
             {dashboardData.itemsRequiringAction.length === 0 ? (
@@ -120,6 +131,41 @@ const Alerts = () => {
           </div>
         </div>
 
+      
+        {showLostSalesModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 max-h-[80vh] flex flex-col">
+              <div className="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                  <h2 className="text-2xl font-bold">Cart Abandonment Breakdown</h2>
+                  <p className="text-gray-500 text-sm">Inventory items removed from carts before checkout</p>
+                </div>
+                <button onClick={() => setShowLostSalesModal(false)} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+              </div>
+
+              <div className="overflow-y-auto flex-1 pr-2 space-y-3">
+                {dashboardData.lostSalesBreakdown?.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8">No abandoned cart items recorded yet.</p>
+                ) : (
+                  dashboardData.lostSalesBreakdown?.map((item) => (
+                    <div key={item._id} className="flex justify-between items-center p-4 bg-gray-50 border border-gray-100 rounded-lg">
+                      <div>
+                        <h4 className="font-bold text-gray-800">{item.name}</h4>
+                        <p className="text-xs text-gray-500">Category: {item.category} • Price: ${item.price}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-red-600 font-bold text-lg">-${item.lostRevenue.toFixed(2)}</p>
+                        <p className="text-xs font-semibold text-gray-500">{item.lostSalesQuantity} units removed</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+       
         {showNotificationModal && (
           <CustomerNotificationModal 
             shopId={shopId} 
