@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { getCampaigns, createCampaign, toggleCampaign, getShopById } from '../services/api';
+import { getCampaigns, createCampaign, toggleCampaign } from '../services/api';
 
 const PromotionsPage = () => {
   const { shopId } = useParams();
-  const [shop, setShop] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newCode, setNewCode] = useState('');
@@ -20,12 +19,8 @@ const PromotionsPage = () => {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      const [campaignsRes, shopRes] = await Promise.all([
-        getCampaigns(shopId),
-        getShopById(shopId)
-      ]);
-      setCampaigns(campaignsRes.data.data);
-      setShop(shopRes.data.data);
+      const res = await getCampaigns(shopId);
+      setCampaigns(res.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -58,9 +53,13 @@ const PromotionsPage = () => {
     }
   };
 
+ 
+  const autoCampaigns = campaigns.filter(c => c.name && c.name.includes('Auto Liquidation'));
+  const standardCampaigns = campaigns.filter(c => !c.name || !c.name.includes('Auto Liquidation'));
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar shopName={shop?.name} shopColor={shop?.color} />
+      <Sidebar />
       <main className="flex-1 ml-56 p-8">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Promotions & Campaigns</h1>
@@ -68,6 +67,7 @@ const PromotionsPage = () => {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h2 className="text-lg font-bold text-gray-900 mb-4">Create Promo Code</h2>
@@ -109,6 +109,7 @@ const PromotionsPage = () => {
           </div>
 
           <div className="lg:col-span-2">
+           
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h2 className="text-lg font-bold text-gray-900">Active & Past Campaigns</h2>
@@ -116,7 +117,7 @@ const PromotionsPage = () => {
 
               {loading ? (
                 <div className="p-6 text-gray-500 text-sm">Loading campaigns...</div>
-              ) : campaigns.length === 0 ? (
+              ) : standardCampaigns.length === 0 ? (
                 <div className="p-10 text-center flex flex-col items-center">
                   <div className="w-16 h-16 bg-gray-50 rounded-full flex justify-center items-center mb-4">
                     <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,7 +140,7 @@ const PromotionsPage = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {campaigns.map((c) => (
+                      {standardCampaigns.map((c) => (
                         <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-6 py-4 font-bold text-gray-900 tracking-wider text-sm">
                             {c.code}
@@ -168,6 +169,47 @@ const PromotionsPage = () => {
                 </div>
               )}
             </div>
+
+     
+            {autoCampaigns.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-6">
+                <h2 className="text-lg font-bold text-gray-900 mb-2">Automated Liquidation Rules</h2>
+                <p className="text-sm text-gray-500 mb-6">These codes were automatically generated for aging or expiring inventory.</p>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50/50">
+                        <th className="px-6 py-4 pb-2 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">Promo Code</th>
+                        <th className="px-6 py-4 pb-2 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">Target Product</th>
+                        <th className="px-6 py-4 pb-2 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
+                        <th className="px-6 py-4 pb-2 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {autoCampaigns.map(campaign => (
+                        <tr key={campaign._id} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="px-6 py-4 font-bold text-gray-900 tracking-wider text-sm">{campaign.code}</td>
+                          <td className="px-6 py-4 text-gray-600 font-medium">{campaign.name.replace('Auto Liquidation: ', '')}</td>
+                          <td className="px-6 py-4">
+                            <span className="bg-red-100 text-red-700 px-2 py-1 rounded-md font-bold text-xs">-{campaign.discountPercentage}%</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button 
+                              onClick={() => handleToggle(campaign._id)}
+                              className={`text-xs font-bold px-3 py-1.5 rounded-lg border ${campaign.isActive ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}
+                            >
+                              {campaign.isActive ? 'Disable' : 'Enable'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </main>
