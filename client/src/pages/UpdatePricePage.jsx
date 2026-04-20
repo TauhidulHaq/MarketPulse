@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import Sidebar from '../components/Sidebar'; 
 
 const UpdatePricePage = () => {
     const { shopId } = useParams();
@@ -25,15 +26,14 @@ const UpdatePricePage = () => {
     };
 
     return (
-     
         <div className="flex min-h-screen bg-gray-50">
-           
-            <div className="w-64 bg-white border-r"></div>
+            {/* Sidebar is fixed, so we add margin to the content area */}
+            <Sidebar shopName="Coffee Loot" />
 
-            <div className="flex-1 p-8">
-                <h1 className="text-2xl font-bold mb-6 text-gray-800">Update Prices</h1>
+            {/* This div pushes the content to the right of the 56-width sidebar */}
+            <div className="flex-1 ml-56 p-8">
+                <h1 className="text-2xl font-bold mb-6 text-gray-800">Update Product Prices</h1>
                 
-               
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {products.map(p => (
                         <div key={p._id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
