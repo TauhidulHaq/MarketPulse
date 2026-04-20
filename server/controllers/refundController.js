@@ -1,59 +1,34 @@
-const Product = require('../models/Product');
-const AuditLog = require('../models/AuditLog');
+const Refund = require('../models/Refund');
+const { success, error } = require('../views/responseHelper');
 
-
-exports.getProducts = async (req, res) => {
+const getRefundsOverview = async (req, res) => {
   try {
-    const { search, shopId } = req.query;
-    
+    const { shopId } = req.params;
+    const refunds = await Refund.find({ shop: shopId })
+      .populate('customer', 'name email')
+      .sort({ createdAt: -1 });
 
-    if (!shopId) return res.status(400).json({ error: 'shopId is required' });
+    const totalAmountRefunded = refunds.reduce((sum, r) => sum + r.amount, 0);
+    const totalRefunds = refunds.length;
 
+    const reasons = ['Defective', 'Wrong Item', 'Not Satisfied', 'Late Delivery', 'Other'];
+    const chartData = reasons.map(name => ({
+      name,
+      value: refunds.filter(r => r.reason === name).length
+    }));
 
-    const query = search 
-      ? { shop: shopId, name: { $regex: `^${search}`, $options: 'i' } } 
-      : { shop: shopId };
-    
-    
-    const products = await Product.find(query).sort({ name: 1 });
-    res.status(200).json(products);
-  } catch (err) {
-    console.error('Error fetching products:', err);
-    res.status(500).json({ error: 'Failed to fetch products' });
-  }
-};
-
-
-exports.updatePrice = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { newPrice } = req.body;
-    
-    if (newPrice === undefined || newPrice < 0) {
-      return res.status(400).json({ error: 'Valid new price is required' });
-    }
-
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-
-    const previousPrice = product.price;
-
-    
-    product.price = newPrice;
-    await product.save();
-
-
-    await AuditLog.create({
-      shop: product.shop,
-      product: id,
-      previousPrice,
-      newPrice,
-      userId: req.user._id 
+    return success(res, {
+      refunds,
+      stats: {
+        totalRefunds,
+        totalAmountRefunded
+      },
+      chartData
     });
-
-    res.status(200).json({ message: 'Price updated successfully', product });
   } catch (err) {
-    console.error('Error updating price:', err);
-    res.status(500).json({ error: 'Failed to update price' });
+    console.error(err);
+    return error(res, 500, 'Failed to fetch refunds overview');
   }
 };
+
+module.exports = { getRefundsOverview };
