@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { getCampaigns, createCampaign, toggleCampaign } from '../services/api';
+import { getCampaigns, createCampaign, toggleCampaign, getShopById } from '../services/api';
 
 const PromotionsPage = () => {
   const { shopId } = useParams();
+  const [shop, setShop] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newCode, setNewCode] = useState('');
@@ -19,8 +20,12 @@ const PromotionsPage = () => {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      const res = await getCampaigns(shopId);
-      setCampaigns(res.data.data);
+      const [campaignsRes, shopRes] = await Promise.all([
+        getCampaigns(shopId),
+        getShopById(shopId)
+      ]);
+      setCampaigns(campaignsRes.data.data);
+      setShop(shopRes.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -55,7 +60,7 @@ const PromotionsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar />
+      <Sidebar shopName={shop?.name} shopColor={shop?.color} />
       <main className="flex-1 ml-56 p-8">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Promotions & Campaigns</h1>
