@@ -50,7 +50,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-
+      
       <Route
         path="/shop/:shopId/alerts"
         element={
@@ -117,6 +117,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/shop/:shopId/update-price"
+        element={
+          <ProtectedRoute>
+            <UpdatePricePage />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
