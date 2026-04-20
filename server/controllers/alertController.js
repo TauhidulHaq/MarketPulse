@@ -14,28 +14,41 @@ exports.getAlertsOverview = async (req, res) => {
   
     const criticalStockItems = await Product.find({ shop: shopId, stock: { $lte: 10 } }).lean();
     const expiringItems = await Product.find({ shop: shopId, status: 'expiring' }).lean();
-    
+
+  //update
   
     const liveSales = await Order.find({ shop: shopId, status: 'completed' })
       .sort({ createdAt: -1 })
       .limit(5)
       .lean();
 
+    //Calc
+    const lostSalesItems = await Product.find({ 
+      shop: shopId, 
+      lostRevenue: { $gt: 0 } 
+    }).sort({ lostRevenue: -1 }).lean();
+
+    //Calc
+    const totalLostRevenue = lostSalesItems.reduce((sum, item) => sum + item.lostRevenue, 0);
+
     const itemsRequiringAction = [
       ...criticalStockItems.map(item => ({ type: 'CRITICAL_STOCK', data: item })),
       ...expiringItems.map(item => ({ type: 'EXPIRY_NOTICE', data: item }))
     ];
-
+//update
     res.status(200).json({
       shop, 
       metrics: {
         criticalStockCount: criticalStockItems.length,
         expiringSoonCount: expiringItems.length,
-        notificationsSent: 40 
+        notificationsSent: 40,
+        totalLostRevenue 
       },
       itemsRequiringAction,
-      liveSales
+      liveSales,
+      lostSalesBreakdown: lostSalesItems 
     });
+
   } catch (error) {
     res.status(500).json({ message: 'Error fetching alerts data', error: error.message });
   }
