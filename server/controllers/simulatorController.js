@@ -91,6 +91,7 @@ const processCheckout = async (req, res) => {
       shop: shopId,
       customer: customer._id,
       orderNumber,
+      customerLocation: customerData.location || { division: 'Unknown', district: 'Unknown' },
       products: orderProducts,
       totalAmount,
       status: 'completed',
