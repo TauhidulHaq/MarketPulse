@@ -4,10 +4,12 @@ const getAllProducts = async (req, res) => {
   try {
     const { shopId, revenueFilter, stockFilter, performanceFilter } = req.query;
     if (!shopId) return res.status(400).json({ success: false, message: "shopId is required" });
+    
     let query = { shop: shopId };
     if (stockFilter === 'low') query.stock = { $lte: 10 };
     else if (stockFilter === 'moderate') query.stock = { $gt: 10, $lte: 50 };
     else if (stockFilter === 'high') query.stock = { $gt: 50 };
+    
     let productsQuery = Product.find(query);
     let sortOption = {};
     if (revenueFilter === 'highest') sortOption.revenue = -1;
@@ -15,6 +17,7 @@ const getAllProducts = async (req, res) => {
     if (performanceFilter === 'highest') sortOption.performance = -1;
     if (performanceFilter === 'lowest') sortOption.performance = 1;
     if (Object.keys(sortOption).length > 0) productsQuery = productsQuery.sort(sortOption);
+    
     const products = await productsQuery;
     res.status(200).json({ success: true, count: products.length, data: products });
   } catch (error) { res.status(500).json({ success: false, message: error.message }); }
