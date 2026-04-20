@@ -192,6 +192,6 @@ module.exports = {
   getSimulatorProducts,
   processCheckout,
   processRefund,
-  getRecentOrders
+  getRecentOrders,
   trackCartRemoval
 };
