@@ -54,6 +54,17 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+
+    lostSalesQuantity: {
+    type: Number,
+    default: 0
+    },
+    lostRevenue: {
+    type: Number,
+    default: 0
+    },
+
+    
     stock: {
       type: Number,
       required: true,
