@@ -1,11 +1,10 @@
 const Product = require('../models/Product');
 
-
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find({ shop: req.query.shopId });
         res.status(200).json({ success: true, data: products });
-    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 };
 
 const updatePrice = async (req, res) => {
@@ -15,13 +14,8 @@ const updatePrice = async (req, res) => {
             { price: req.body.newPrice }, 
             { new: true }
         );
-        if (!product) return res.status(404).json({ error: 'Product not found' });
-        res.status(200).json({ message: 'Success', product });
+        res.status(200).json({ success: true, product });
     } catch (err) { res.status(500).json({ error: 'Failed' }); }
 };
 
-
-module.exports = {
-    getAllProducts,
-    updatePrice
-};
+module.exports = { getAllProducts, updatePrice };
