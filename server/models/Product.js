@@ -55,6 +55,16 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+  autoPromoCode: {
+        type: String,
+        default: null
+      },
+      autoPromoDiscount: {
+        type: Number,
+        default: 0
+      },
+    
+
     lostSalesQuantity: {
     type: Number,
     default: 0
