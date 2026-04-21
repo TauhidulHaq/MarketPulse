@@ -10,6 +10,7 @@ import Alerts from './pages/Alerts';
 import SimulatorPage from './pages/SimulatorPage';
 import PromotionsPage from './pages/PromotionsPage';
 import RefundsPage from './pages/RefundsPage';
+import OrdersPage from './pages/OrdersPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -31,6 +32,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route
         path="/shops"
@@ -104,6 +106,14 @@ function App() {
         element={
           <ProtectedRoute>
             <RefundsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/orders"
+        element={
+          <ProtectedRoute>
+            <OrdersPage />
           </ProtectedRoute>
         }
       />

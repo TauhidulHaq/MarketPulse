@@ -14,6 +14,9 @@ const alertRoutes = require('./routes/alertRoutes');
 const simulatorRoutes = require('./routes/simulatorRoutes');
 const campaignRoutes = require('./routes/campaignRoutes');
 const refundRoutes = require('./routes/refundRoutes');
+const goalRoutes = require('./routes/goalRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
@@ -30,6 +33,9 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/simulator', simulatorRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/refunds', refundRoutes);
+app.use('/api/shops', goalRoutes);
+app.use('/api/products', reviewRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Market Pulse API is running' });

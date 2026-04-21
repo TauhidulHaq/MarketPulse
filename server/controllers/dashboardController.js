@@ -83,4 +83,69 @@ const getOverview = async (req, res) => {
   }
 };
 
-module.exports = { getOverview };
+const getTopHours = async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    const { start, end } = req.query;
+
+    const startDate = start ? new Date(start) : new Date(new Date().setDate(new Date().getDate() - 30));
+    const endDate = end ? new Date(end) : new Date();
+    if (end) {
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+      return error(res, 400, 'Invalid date range. Use YYYY-MM-DD format.');
+    }
+
+    const rows = await Order.aggregate([
+      {
+        $match: {
+          shop: new mongoose.Types.ObjectId(shopId),
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: { $in: ['completed', 'delivered'] },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            day: { $dayOfWeek: '$createdAt' },
+            hour: { $hour: '$createdAt' },
+          },
+          revenue: { $sum: '$totalAmount' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          day: { $subtract: ['$_id.day', 1] },
+          hour: '$_id.hour',
+          revenue: 1,
+        },
+      },
+      { $sort: { day: 1, hour: 1 } },
+    ]);
+
+    const matrix = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
+
+    rows.forEach((item) => {
+      matrix[item.day][item.hour] = item.revenue;
+    });
+
+    return success(
+      res,
+      {
+        start: startDate,
+        end: endDate,
+        points: rows,
+        matrix,
+      },
+      'Top hours heatmap retrieved successfully.'
+    );
+  } catch (err) {
+    console.error('getTopHours error:', err);
+    return error(res, 500, 'Failed to retrieve top hours heatmap.');
+  }
+};
+
+module.exports = { getOverview, getTopHours };

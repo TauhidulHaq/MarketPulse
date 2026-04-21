@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import SummaryCard from '../components/SummaryCard';
+import RatingsSummary from '../components/RatingsSummary';
 
 const InventoryPage = () => {
   const { shopId } = useParams();
@@ -93,6 +94,9 @@ const InventoryPage = () => {
                   value={`${product.performance}%`}
                   change={product.performanceTrend} 
                 />
+              </div>
+              <div className="mt-3 max-w-sm">
+                <RatingsSummary productId={product._id} />
               </div>
             </div>
           ))}

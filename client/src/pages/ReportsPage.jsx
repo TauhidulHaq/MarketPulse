@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import SummaryCard from '../components/SummaryCard';
+import RatingsSummary from '../components/RatingsSummary';
 
 const ReportsPage = () => {
   const { shopId } = useParams();
@@ -58,6 +59,9 @@ const ReportsPage = () => {
                   <div className="w-24 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-[10px] text-gray-300 italic">
                     Product Image
                   </div>
+                  <div className="w-64">
+                    <RatingsSummary productId={product._id} />
+                  </div>
                 </div>
                 <button 
                   onClick={() => handleGenerateReport(product)}
@@ -105,6 +109,10 @@ const ReportsPage = () => {
                   </svg>
                 </div>
               </div>
+            </div>
+
+            <div className="max-w-md">
+              <RatingsSummary productId={selectedProduct?._id} />
             </div>
 
             {/* Metrics*/}

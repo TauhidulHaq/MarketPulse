@@ -9,7 +9,7 @@ const Sidebar = ({ shopName, shopColor }) => {
     { label: 'Overview', path: `/shop/${shopId}/overview`, icon: 'grid' },
     { label: 'Alerts', path: `/shop/${shopId}/alerts`, icon: 'alert' },
     { label: 'Inventory', path: `/shop/${shopId}/inventory`, icon: 'inventory' },
-    { label: 'Sales', path: `/shop/${shopId}/sales`, icon: 'cart' },
+    { label: 'Orders', path: `/shop/${shopId}/orders`, icon: 'cart' },
     { label: 'Reports', path: `/shop/${shopId}/reports`, icon: 'report' },
     { label: 'Customer', path: `/shop/${shopId}/customers`, icon: 'customer' },
     { label: 'Promotions', path: `/shop/${shopId}/campaigns`, icon: 'inventory' },
