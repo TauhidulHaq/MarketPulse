@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 const CustomerNotificationModal = ({ shopId, onClose, onNotify }) => {
   const [customers, setCustomers] = useState([]);
@@ -9,7 +9,7 @@ const CustomerNotificationModal = ({ shopId, onClose, onNotify }) => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const { data } = await axios.get(`/api/alerts/${shopId}/customers-to-notify`);
+        const { data } = await api.get(`/alerts/${shopId}/customers-to-notify`);
         setCustomers(data);
       } catch (error) {
         console.error("Error fetching customers to notify", error);

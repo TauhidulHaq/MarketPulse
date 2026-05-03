@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import CustomerNotificationModal from '../components/CustomerNotificationModal';
@@ -14,7 +14,7 @@ const Alerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const { data } = await axios.get(`/api/alerts/${shopId}/overview`);
+        const { data } = await api.get(`/alerts/${shopId}/overview`);
         setDashboardData(data);
         setNotifCount(data.metrics.notificationsSent);
       } catch (error) {

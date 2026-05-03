@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import Sidebar from '../components/Sidebar';
 import SummaryCard from '../components/SummaryCard';
 
@@ -13,7 +13,7 @@ const ReportsPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`/api/products?shopId=${shopId}`);
+      const res = await api.get(`/products?shopId=${shopId}`);
       setProducts(res.data.data);
     } catch (err) { console.error("Error fetching products:", err); }
   };
@@ -28,7 +28,7 @@ const ReportsPage = () => {
   const handleGenerateReport = async (product) => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/reports/single-product?productId=${product._id}`);
+      const res = await api.get(`/reports/single-product?productId=${product._id}`);
       setReportData({ ...res.data.data, image: product.image });
       setSelectedProduct(product);
     } catch (err) { console.error("Error generating report:", err); } 

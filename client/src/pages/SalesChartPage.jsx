@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import Sidebar from '../components/Sidebar';
 import { Bar } from 'react-chartjs-2';
 import { 
@@ -23,7 +23,7 @@ const SalesChartPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/sales/divisions')
+    api.get('/sales/divisions')
       .then(res => setDivisions(res.data.data))
       .catch(err => console.error("Error fetching divisions:", err));
   }, []);
@@ -32,7 +32,7 @@ const SalesChartPage = () => {
   const handleDivChange = (div) => {
     setFilters({ division: div, district: '' });
     setDistricts([]); 
-    axios.get(`/api/sales/divisions/${div}/districts`)
+    api.get(`/sales/divisions/${div}/districts`)
       .then(res => setDistricts(res.data.data))
       .catch(err => console.error("Error fetching districts:", err));
   };
@@ -41,7 +41,7 @@ const SalesChartPage = () => {
     if (!filters.division || !filters.district) return;
     setLoading(true);
     try {
-      const res = await axios.get(`/api/sales/location-revenue?division=${filters.division}&district=${filters.district}`);
+      const res = await api.get(`/sales/location-revenue?division=${filters.division}&district=${filters.district}`);
       const { labels, values } = res.data.data;
       
       setChartData({

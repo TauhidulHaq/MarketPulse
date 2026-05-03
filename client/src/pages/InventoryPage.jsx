@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import Sidebar from '../components/Sidebar';
 import SummaryCard from '../components/SummaryCard';
 
@@ -11,7 +11,7 @@ const InventoryPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`/api/products`, {
+      const res = await api.get(`/products`, {
         params: { 
           shopId, 
           revenueFilter: filters.revenue, 

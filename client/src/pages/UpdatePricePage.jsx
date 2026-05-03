@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar'; 
 
@@ -10,7 +10,7 @@ const UpdatePricePage = () => {
 
     const loadProducts = async () => {
         try {
-            const res = await axios.get(`/api/products?shopId=${shopId}`);
+            const res = await api.get(`/products?shopId=${shopId}`);
             setProducts(res.data.data);
         } catch (err) { console.error("Failed to load", err); }
     };
@@ -19,7 +19,7 @@ const UpdatePricePage = () => {
 
     const savePrice = async (id) => {
         try {
-            await axios.patch(`/api/products/${id}/price`, { newPrice: newPrices[id] });
+            await api.patch(`/products/${id}/price`, { newPrice: newPrices[id] });
             await loadProducts();
             setNewPrices({...newPrices, [id]: ''});
         } catch (err) { alert("Error"); }
