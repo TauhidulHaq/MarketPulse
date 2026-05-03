@@ -14,7 +14,6 @@ const getSimulatorProducts = async (req, res) => {
     const currentDate = new Date();
     let rulesApplied = false;
 
-
     for (let product of products) {
       if (product.expirationDate) {
         const daysToExpiry = Math.ceil((product.expirationDate - currentDate) / (1000 * 60 * 60 * 24));
@@ -28,13 +27,11 @@ const getSimulatorProducts = async (req, res) => {
           targetDiscount = 30;
         }
 
-        //
         if (targetDiscount > 0 && product.autoPromoDiscount !== targetDiscount) {
-
-
           const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
-          const newCode = `${prefix}${targetDiscount}`;
-
+          // Add shop-specific suffix to prevent duplicate key errors across shops
+          const shopSuffix = shopId.toString().slice(-4).toUpperCase();
+          const newCode = `${prefix}${targetDiscount}-${shopSuffix}`;
 
           let campaign = await Campaign.findOne({ shop: shopId, code: newCode });
 
@@ -50,7 +47,6 @@ const getSimulatorProducts = async (req, res) => {
             });
           }
 
-
           product.autoPromoCode = newCode;
           product.autoPromoDiscount = targetDiscount;
           await product.save();
@@ -59,14 +55,13 @@ const getSimulatorProducts = async (req, res) => {
       }
     }
 
-
     if (rulesApplied) {
       products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
     }
 
     return success(res, products, 'Products retrieved for simulator.');
   } catch (err) {
-    console.error(err);
+    console.error('Simulator products error:', err);
     return error(res, 500, 'Failed to fetch simulator products.');
   }
 };
@@ -83,7 +78,6 @@ const processCheckout = async (req, res) => {
     let campaign = null;
     let discountMultiplier = 1;
     if (promoCode) {
-      const Campaign = require('../models/Campaign');
       campaign = await Campaign.findOne({ shop: shopId, code: promoCode.toUpperCase(), isActive: true });
       if (campaign) {
         discountMultiplier = 1 - (campaign.discountPercentage / 100);
@@ -242,7 +236,6 @@ const trackCartRemoval = async (req, res) => {
     return error(res, 500, 'Failed to track removal.');
   }
 };
-
 
 module.exports = {
   getSimulatorProducts,
