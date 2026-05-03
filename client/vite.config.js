@@ -3,11 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  build: {//render frontend er jonno
-    rollupOptions: {
-      external: ['react/jsx-runtime'],
-    },
-  },
   server: {
     port: 5173,
     proxy: {
