@@ -29,7 +29,7 @@ const getSimulatorProducts = async (req, res) => {
 
         if (targetDiscount > 0 && product.autoPromoDiscount !== targetDiscount) {
           const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
-          // Add shop-specific suffix to prevent duplicate key errors across shops
+
           const shopSuffix = shopId.toString().slice(-4).toUpperCase();
           const newCode = `${prefix}${targetDiscount}-${shopSuffix}`;
 
