@@ -1,4 +1,6 @@
 node_modules/
+dist/
+build/
 .env*
 *.log
-seed.js
+.DS_Store
