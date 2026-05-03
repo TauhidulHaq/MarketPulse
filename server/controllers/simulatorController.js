@@ -3,11 +3,9 @@ const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Refund = require('../models/Refund');
 const mongoose = require('mongoose');
-const Campaign = require('../models/Campaign'); //added this 
+const Campaign = require('../models/Campaign');
 const { success, error } = require('../views/responseHelper');
 
-
-//added
 const getSimulatorProducts = async (req, res) => {
   try {
     const { shopId } = req.params;
@@ -16,30 +14,30 @@ const getSimulatorProducts = async (req, res) => {
     const currentDate = new Date();
     let rulesApplied = false;
 
-    
+
     for (let product of products) {
       if (product.expirationDate) {
         const daysToExpiry = Math.ceil((product.expirationDate - currentDate) / (1000 * 60 * 60 * 24));
         let targetDiscount = 0;
 
         if (daysToExpiry > 0 && daysToExpiry <= 7) {
-          targetDiscount = 50; 
+          targetDiscount = 50;
         } else if (daysToExpiry > 7 && daysToExpiry <= 14) {
-          targetDiscount = 40; 
+          targetDiscount = 40;
         } else if (daysToExpiry > 14 && daysToExpiry <= 30) {
-          targetDiscount = 30; 
+          targetDiscount = 30;
         }
 
         //
         if (targetDiscount > 0 && product.autoPromoDiscount !== targetDiscount) {
-          
-         
-          const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
-          const newCode = `${prefix}${targetDiscount}`; // e.g., ESPR50 or LATT30
 
-     
+
+          const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
+          const newCode = `${prefix}${targetDiscount}`;
+
+
           let campaign = await Campaign.findOne({ shop: shopId, code: newCode });
-          
+
           if (!campaign) {
             await Campaign.create({
               shop: shopId,
@@ -52,7 +50,7 @@ const getSimulatorProducts = async (req, res) => {
             });
           }
 
- 
+
           product.autoPromoCode = newCode;
           product.autoPromoDiscount = targetDiscount;
           await product.save();
@@ -61,7 +59,7 @@ const getSimulatorProducts = async (req, res) => {
       }
     }
 
-    
+
     if (rulesApplied) {
       products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
     }
@@ -230,7 +228,7 @@ const getRecentOrders = async (req, res) => {
 const trackCartRemoval = async (req, res) => {
   try {
     const { productId, quantity, price } = req.body;
-    
+
     const product = await Product.findById(productId);
     if (product) {
       product.lostSalesQuantity = (product.lostSalesQuantity || 0) + quantity;
