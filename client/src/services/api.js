@@ -32,7 +32,7 @@ api.interceptors.response.use(
 );
 
 export const loginUser = (data) => api.post('/auth/login', data);
-export const registerUser = (data) => api.post('/auth/register', data);
+export const registerUser = (data) => api.post('/api/auth/register', data);
 export const getMe = () => api.get('/auth/me');
 
 export const getShops = () => api.get('/shops');

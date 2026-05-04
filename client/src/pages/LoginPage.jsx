@@ -97,9 +97,14 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <p className="mt-6 text-xs text-gray-400 animate-fade-in delay-500">
-        Demo: admin / admin123
-      </p>
+      <div className="flex justify-between items-center mt-6">
+        <p className="text-xs text-gray-400 animate-fade-in delay-500">
+          Demo: admin / admin123
+        </p>
+        <a href="/register" className="text-xs text-brand-blue hover:underline animate-fade-in delay-500">
+          Don't have an account? Register
+        </a>
+      </div>
     </div>
   );
 };
