@@ -1,89 +1,38 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
+const { success, error } = require('../views/responseHelper');
 
 exports.generateSingleProductReport = async (req, res) => {
   try {
     const { productId } = req.query;
+    const pId = new mongoose.Types.ObjectId(productId);
 
-    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({
-        success: false,
-        message: "A valid productId is required.",
-      });
-    }
-
-    const productObjectId = new mongoose.Types.ObjectId(productId);
-
+  
     const stats = await Order.aggregate([
-      {
-        $match: {
-          "products.product": productObjectId,
-          status: "completed"
-        }
-      },
+      { $match: { "products.product": pId, status: "completed" } },
       { $unwind: "$products" },
-      {
-        $match: {
-          "products.product": productObjectId
-        }
-      },
-      {
-        $group: {
-          _id: "$products.saleSource",
-          revenue: {
-            $sum: { $multiply: ["$products.price", "$products.quantity"] }
-          },
-          profit: {
-            $sum: {
-              $multiply: [
-                { $subtract: ["$products.price", "$products.cost"] },
-                "$products.quantity"
-              ]
-            }
-          }
-        }
-      }
+      { $match: { "products.product": pId } },
+      { $group: { _id: { $toLower: "$products.saleSource" }, revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } } } }
     ]);
 
-    const productDetails = await Product.findById(productId);
 
-    const totalProfit = stats.reduce((acc, s) => acc + s.profit, 0);
+    console.log("Database saleSource tags found:", stats);
 
-    let evaluation = 'Bad';
-    if (totalProfit > 5000) evaluation = 'GOOD';
-    else if (totalProfit > 2000) evaluation = 'Moderate';
+    const product = await Product.findById(productId);
+    
 
-    const campaignsData = stats.find(s => s._id === 'campaign') || { revenue: 0, profit: 0 };
+    const campaignsData = stats.find(s => s._id === 'campaign') || { revenue: 0 };
+    
 
-    const otherSalesData = stats
-      .filter(s => s._id !== 'campaign')
-      .reduce(
-        (acc, curr) => {
-          acc.revenue += curr.revenue;
-          acc.profit += curr.profit;
-          return acc;
-        },
-        { revenue: 0, profit: 0 }
-      );
+    const otherRevenue = stats.filter(s => s._id !== 'campaign').reduce((sum, s) => sum + s.revenue, 0);
 
-    res.status(200).json({
-      success: true,
-      data: {
-        productName: productDetails?.name || "Unknown Product",
-        evaluation,
-        totalProfit: parseFloat(totalProfit.toFixed(2)),
-        revenueBreakdown: {
-          campaigns: parseFloat(campaignsData.revenue.toFixed(2)),
-          other: parseFloat(otherSalesData.revenue.toFixed(2))
-        }
-      },
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+    return success(res, {
+      productName: product?.name,
+      revenueBreakdown: {
+        campaigns: parseFloat(campaignsData.revenue.toFixed(2)),
+        other: parseFloat(otherRevenue.toFixed(2))
+      }
+    }, "Report generated.");
+  } catch (err) { return error(res, 500, err.message); }
 };

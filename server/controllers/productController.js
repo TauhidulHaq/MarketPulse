@@ -1,65 +1,21 @@
 const Product = require('../models/Product');
 
-exports.getAllProducts = async (req, res) => {
-  try {
-    const { shopId, revenueFilter, stockFilter, performanceFilter } = req.query;
-
-    if (!shopId) {
-      return res.status(400).json({ success: false, message: "shopId is required" });
-    }
-
-    let query = { shop: shopId };
-
-    if (stockFilter === 'low') {
-      query.stock = { $lte: 10 };
-    } else if (stockFilter === 'moderate') {
-      query.stock = { $gt: 10, $lte: 50 };
-    } else if (stockFilter === 'high') {
-      query.stock = { $gt: 50 };
-    }
-
-    let productsQuery = Product.find(query);
-
-    let sortOption = {};
-
-    if (revenueFilter === 'highest') sortOption.revenue = -1;
-    if (revenueFilter === 'lowest') sortOption.revenue = 1;
-
-    if (performanceFilter === 'highest') sortOption.performance = -1;
-    if (performanceFilter === 'lowest') sortOption.performance = 1;
-
-    if (Object.keys(sortOption).length > 0) {
-      productsQuery = productsQuery.sort(sortOption);
-    }
-
-    const products = await productsQuery;
-
-    res.status(200).json({
-      success: true,
-      count: products.length,
-      data: products
-    });
-
-  } catch (error) {
-    console.error("Error in getAllProducts:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
+const getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ shop: req.query.shopId });
+        res.status(200).json({ success: true, data: products });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 };
 
-exports.getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
-    }
-
-    res.status(200).json({ success: true, data: product });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+const updatePrice = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id, 
+            { price: req.body.newPrice }, 
+            { new: true }
+        );
+        res.status(200).json({ success: true, product });
+    } catch (err) { res.status(500).json({ error: 'Failed' }); }
 };
+
+module.exports = { getAllProducts, updatePrice };

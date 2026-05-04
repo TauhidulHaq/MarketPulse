@@ -18,6 +18,20 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    image: {
+      type: String,
+      default: 'https://via.placeholder.com/150' 
+    },
+    campaignRevenue: {
+      type: Number,
+      default: 0,
+    },
+    otherRevenue: {
+      type: Number,
+      default: 0,
+    },
+    price: { 
+      type: Number, required: true, min: 0 },
     performance: {
       type: Number,
       default: 0, 
@@ -40,6 +54,27 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+
+  autoPromoCode: {
+        type: String,
+        default: null
+      },
+      autoPromoDiscount: {
+        type: Number,
+        default: 0
+      },
+    
+
+    lostSalesQuantity: {
+    type: Number,
+    default: 0
+    },
+    lostRevenue: {
+    type: Number,
+    default: 0
+    },
+
+    
     stock: {
       type: Number,
       required: true,

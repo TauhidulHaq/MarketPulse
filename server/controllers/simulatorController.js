@@ -3,14 +3,65 @@ const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Refund = require('../models/Refund');
 const mongoose = require('mongoose');
+const Campaign = require('../models/Campaign');
 const { success, error } = require('../views/responseHelper');
 
 const getSimulatorProducts = async (req, res) => {
   try {
     const { shopId } = req.params;
-    const products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+    let products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+
+    const currentDate = new Date();
+    let rulesApplied = false;
+
+    for (let product of products) {
+      if (product.expirationDate) {
+        const daysToExpiry = Math.ceil((product.expirationDate - currentDate) / (1000 * 60 * 60 * 24));
+        let targetDiscount = 0;
+
+        if (daysToExpiry > 0 && daysToExpiry <= 7) {
+          targetDiscount = 50;
+        } else if (daysToExpiry > 7 && daysToExpiry <= 14) {
+          targetDiscount = 40;
+        } else if (daysToExpiry > 14 && daysToExpiry <= 30) {
+          targetDiscount = 30;
+        }
+
+        if (targetDiscount > 0 && product.autoPromoDiscount !== targetDiscount) {
+          const prefix = product.name.substring(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+          const shopSuffix = shopId.toString().slice(-4).toUpperCase();
+          const newCode = `${prefix}${targetDiscount}-${shopSuffix}`;
+
+          let campaign = await Campaign.findOne({ shop: shopId, code: newCode });
+
+          if (!campaign) {
+            await Campaign.create({
+              shop: shopId,
+              name: `Auto Liquidation: ${product.name}`,
+              code: newCode,
+              discountPercentage: targetDiscount,
+              isActive: true,
+              usageCount: 0,
+              revenueGenerated: 0
+            });
+          }
+
+          product.autoPromoCode = newCode;
+          product.autoPromoDiscount = targetDiscount;
+          await product.save();
+          rulesApplied = true;
+        }
+      }
+    }
+
+    if (rulesApplied) {
+      products = await Product.find({ shop: shopId, stock: { $gt: 0 } });
+    }
+
     return success(res, products, 'Products retrieved for simulator.');
   } catch (err) {
+    console.error('Simulator products error:', err);
     return error(res, 500, 'Failed to fetch simulator products.');
   }
 };
@@ -27,7 +78,6 @@ const processCheckout = async (req, res) => {
     let campaign = null;
     let discountMultiplier = 1;
     if (promoCode) {
-      const Campaign = require('../models/Campaign');
       campaign = await Campaign.findOne({ shop: shopId, code: promoCode.toUpperCase(), isActive: true });
       if (campaign) {
         discountMultiplier = 1 - (campaign.discountPercentage / 100);
@@ -91,6 +141,7 @@ const processCheckout = async (req, res) => {
       shop: shopId,
       customer: customer._id,
       orderNumber,
+      customerLocation: customerData.location || { division: 'Unknown', district: 'Unknown' },
       products: orderProducts,
       totalAmount,
       status: 'completed',
@@ -166,11 +217,30 @@ const getRecentOrders = async (req, res) => {
   } catch (err) {
     return error(res, 500, 'Failed to fetch recent orders.');
   }
-}
+};
+
+const trackCartRemoval = async (req, res) => {
+  try {
+    const { productId, quantity, price } = req.body;
+
+    const product = await Product.findById(productId);
+    if (product) {
+      product.lostSalesQuantity = (product.lostSalesQuantity || 0) + quantity;
+      product.lostRevenue = (product.lostRevenue || 0) + (quantity * price);
+      await product.save();
+    }
+
+    return success(res, null, 'Cart removal tracked.');
+  } catch (err) {
+    console.error('Track removal error:', err);
+    return error(res, 500, 'Failed to track removal.');
+  }
+};
 
 module.exports = {
   getSimulatorProducts,
   processCheckout,
   processRefund,
-  getRecentOrders
+  getRecentOrders,
+  trackCartRemoval
 };

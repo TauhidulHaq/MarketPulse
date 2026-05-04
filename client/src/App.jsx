@@ -11,6 +11,8 @@ import SimulatorPage from './pages/SimulatorPage';
 import PromotionsPage from './pages/PromotionsPage';
 import RefundsPage from './pages/RefundsPage';
 import OrdersPage from './pages/OrdersPage';
+import SalesChartPage from './pages/SalesChartPage';
+import UpdatePricePage from './pages/UpdatePricePage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -50,7 +52,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-
+      
       <Route
         path="/shop/:shopId/alerts"
         element={
@@ -73,6 +75,14 @@ function App() {
         element={
           <ProtectedRoute>
             <ReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/sales-chart"
+        element={
+          <ProtectedRoute>
+            <SalesChartPage />
           </ProtectedRoute>
         }
       />
@@ -114,6 +124,14 @@ function App() {
         element={
           <ProtectedRoute>
             <OrdersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop/:shopId/update-price"
+        element={
+          <ProtectedRoute>
+            <UpdatePricePage />
           </ProtectedRoute>
         }
       />

@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { getSimulatorProducts, processSimulationCheckout, processSimulationRefund, getSimulatorRecentOrders, validateCampaign } from '../services/api';
+
+import { 
+  getSimulatorProducts, 
+  processSimulationCheckout, 
+  processSimulationRefund, 
+  getSimulatorRecentOrders, 
+  validateCampaign,
+  trackCartRemovalAPI
+} from '../services/api';
 
 const SimulatorPage = () => {
   const { shopId } = useParams();
@@ -55,7 +63,24 @@ const SimulatorPage = () => {
     }
   };
 
-  const changeQty = (productId, delta) => {
+  const changeQty = async (productId, delta) => {
+ ///
+    if (delta < 0) {
+      const itemToReduce = cart.find(item => item.productId === productId);
+      if (itemToReduce) {
+        try {
+          await trackCartRemovalAPI(shopId, {
+            productId: itemToReduce.productId,
+            quantity: Math.abs(delta),
+            price: itemToReduce.price
+          });
+        } catch (err) {
+          console.error("Failed to track cart abandonment", err);
+        }
+      }
+    }
+
+    
     setCart(cart.map(item => {
       if (item.productId === productId) {
         return { ...item, quantity: item.quantity + delta };
@@ -164,6 +189,16 @@ const SimulatorPage = () => {
                       Add
                     </button>
                   </div>
+                  
+            
+                  {p.autoPromoCode && (
+                    <div className="mt-4 p-2 bg-red-50 border border-red-100 rounded-lg text-center">
+                      <p className="text-xs text-red-700 font-medium">
+                        Use code <span className="font-bold bg-white px-1.5 py-0.5 rounded border border-red-200 tracking-wide">{p.autoPromoCode}</span> for <span className="font-bold">{p.autoPromoDiscount}% discount</span>
+                      </p>
+                    </div>
+                  )}
+
                 </div>
               ))}
               {products.length === 0 && <p className="text-gray-500 text-sm">No products available. Add some products first.</p>}
@@ -300,7 +335,6 @@ const SimulatorPage = () => {
         )}
 
       </main>
-
 
       {toast && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 z-50 animate-bounce">

@@ -13,6 +13,10 @@ const orderSchema = new mongoose.Schema(
       ref: 'Customer',
       required: true,
     },
+    customerLocation: {
+    division: { type: String, default: 'Unknown' },
+    district: { type: String, default: 'Unknown' }
+    },
     orderNumber: {
       type: String,
       required: true,

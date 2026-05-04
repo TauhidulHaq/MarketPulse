@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { getRefundsOverview } from '../services/api';
+import { getRefundsOverview, getShopById } from '../services/api';
 
 const RefundsPage = () => {
   const { shopId } = useParams();
+  const [shop, setShop] = useState(null);
   const [refunds, setRefunds] = useState([]);
   const [stats, setStats] = useState({ totalRefunds: 0, totalAmountRefunded: 0 });
   const [chartData, setChartData] = useState([]);
@@ -17,10 +18,14 @@ const RefundsPage = () => {
   const fetchRefunds = async () => {
     try {
       setLoading(true);
-      const res = await getRefundsOverview(shopId);
-      setRefunds(res.data.data.refunds);
-      setStats(res.data.data.stats);
-      setChartData(res.data.data.chartData);
+      const [refundsRes, shopRes] = await Promise.all([
+        getRefundsOverview(shopId),
+        getShopById(shopId)
+      ]);
+      setRefunds(refundsRes.data.data.refunds);
+      setStats(refundsRes.data.data.stats);
+      setChartData(refundsRes.data.data.chartData);
+      setShop(shopRes.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -35,7 +40,7 @@ const RefundsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar />
+      <Sidebar shopName={shop?.name} shopColor={shop?.color} />
       <main className="flex-1 ml-56 p-8">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Refunds Management</h1>
